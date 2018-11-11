@@ -12,34 +12,54 @@ def peak_absolute_error(image1, image2):
     return np.amax(absdiff(image1, image2))
 
 def absdiff(image1, image2):
-    # Problem z underflow?
-    print(image1[0][0])
-    print(image2[0][0])
-    print(image1[0][0] - image2[0][0])
-    return np.fabs(image1 - image2).astype(np.uint8)
+    return np.fabs(image1.astype(np.int16) - image2.astype(np.int16)).astype(np.uint8)
 
 def structural_similarity_index(image1, image2):
     return compare_ssim(image1, image2, multichannel=True)
 
 def peak_signal_to_noise_ratio(image1, image2):
-    print()
     return 10 * math.log10(255 ** 2 / mean_square_error(image1, image2))
 
+def gaussian_noise(image, mean, std):
+    image_noisy = image.astype(np.int16) + np.random.normal(mean, std, image.shape).astype(np.int16)
+    return np.clip(image_noisy, 0, 255).astype(np.uint8)
 
-head_perfect = plt.imread('1.jpg').astype(np.uint8)
-head_disrupted = plt.imread('3.jpg').astype(np.uint8)
-heads = head_perfect, head_disrupted
+def quality_metrics(image1, image2):
+    images = image1, image2
+    return {
+        'Peak Absolute Error': peak_absolute_error(*images),
+        'Mean Square Error': mean_square_error(*images),
+        'Peak Signal-to-Noise Ratio': peak_signal_to_noise_ratio(*images),
+        'Structural Similarity Index': structural_similarity_index(*images),
+    }
 
-plt.subplot(311)
-plt.imshow(head_perfect, cmap='gray')
-plt.subplot(312)
-plt.imshow(head_disrupted, cmap='gray')
-plt.subplot(313)
-plt.imshow(absdiff(*heads), cmap='gray')
+def ex1_1():
+    head_perfect = plt.imread('1.jpg').astype(np.uint8)
+    head_disrupted = plt.imread('3.jpg').astype(np.uint8)
+    heads = head_perfect, head_disrupted
+    plt.subplot(311)
+    plt.imshow(head_perfect, cmap='gray')
+    plt.subplot(312)
+    plt.imshow(head_disrupted, cmap='gray')
+    plt.subplot(313)
+    plt.imshow(absdiff(*heads), cmap='gray')
+    print(quality_metrics(*heads))
+    plt.show()
 
-print('Peak Absolute Error:', peak_absolute_error(*heads))
-print('Mean Square Error:', mean_square_error(*heads))
-print('Peak Signal-to-Noise Ratio', peak_signal_to_noise_ratio(*heads))
-print('Structural Similarity Index:', structural_similarity_index(*heads))
+def ex1_2():
+    mean = 0.0
+    stds = [5.0, 30.0, 100.0, 500.0]
+    head_perfect = plt.imread('1.jpg').astype(np.uint8)
+    for n, std in enumerate(stds):
+        head_noisy = gaussian_noise(head_perfect, mean, std)
+        plt.subplot(220 + n + 1)
+        plt.imshow(head_noisy)
+        print(quality_metrics(head_perfect, head_noisy))
+    plt.show()
 
-plt.show()
+def ex2():
+    raise 'Hard to do in Python, consider using matlab.engine'
+
+
+if __name__ == '__main__':
+    ex2()
