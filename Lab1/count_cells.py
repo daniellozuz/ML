@@ -9,7 +9,7 @@ ROI = np.s_[600:700, 600:700]
 
 
 def rgb2gray(rgb):
-    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114]).astype(int)
+    return np.dot(rgb[..., :3], [0.299, 0.587, 0.114]).astype(int)
 
 
 blood_cells = plt.imread('blood_cells.jpg')
