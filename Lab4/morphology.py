@@ -1,12 +1,13 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from skimage.morphology import skeletonize, closing, opening, disk
-from skimage.measure import find_contours
-from skimage import img_as_ubyte
 import cv2
+import matplotlib.pyplot as plt
+import numpy as np
 from scipy.ndimage.morphology import binary_hit_or_miss
+from skimage import img_as_ubyte
+from skimage.filters import gaussian, sobel
+from skimage.measure import find_contours
+from skimage.morphology import closing, disk, opening, skeletonize
 from skimage.restoration.inpaint import inpaint_biharmonic
-from skimage.filters import sobel, gaussian
+from skimage.color import rgb2gray
 
 
 def fingerprint():
@@ -79,6 +80,34 @@ def pancreas():
     plt.show()
 
 
+def eye(image_name):
+    eye_color = plt.imread(image_name)
+    eye_gray = rgb2gray(eye_color)
+    plt.subplot(231)
+    plt.imshow(eye_gray, cmap='gray')
+
+    eye_sobel = sobel(eye_gray)
+    plt.subplot(232)
+    plt.imshow(eye_sobel, cmap='gray')
+
+    veins = eye_sobel > 0.02
+    plt.subplot(233)
+    plt.imshow(veins, cmap='gray')
+
+    plt.subplot(234)
+    plt.imshow(opening(veins), cmap='gray')
+
+    fat_skeleton = closing(opening(veins), selem=disk(3))
+    plt.subplot(235)
+    plt.imshow(fat_skeleton, cmap='gray')
+
+    plt.subplot(236)
+    plt.imshow(skeletonize(fat_skeleton), cmap='gray')
+
+    plt.show()
+
+
 if __name__ == '__main__':
     # fingerprint()
-    pancreas()
+    # pancreas()
+    eye('retinal2.jpg')
