@@ -56,7 +56,26 @@ def water():
         plt.subplot(4, 4, 4 * n + 4)
         plt.imshow(cells)
 
+        show_metrics(prediction=sth, labels=cells)
+
     plt.show()
+
+
+def show_metrics(prediction, labels):
+    prediction = prediction == 1
+    labels = labels == 255
+    true_positive = np.sum(np.logical_and(prediction, labels))
+    true_negative = np.sum(np.logical_and(np.logical_not(prediction), np.logical_not(labels)))
+    false_positive = np.sum(np.logical_and(prediction, np.logical_not(labels)))
+    false_negative = np.sum(np.logical_and(np.logical_not(prediction), labels))
+    metrics = {
+        'Sensitivity': true_positive / (true_positive + false_negative),
+        'Precision': true_positive / (true_negative + false_positive),
+        'Dice': 2 * true_positive / (2 * true_positive + false_positive + false_negative),
+        'Jaccard': true_positive / (true_positive + false_positive + false_negative),
+    }
+    for metric, value in metrics.items():
+        print(f'{metric:<11} {value:.2f}')
 
 
 def lungs():
@@ -69,7 +88,28 @@ def lungs():
 
     plt.show()
 
+
+def water2():
+    gfp = plt.imread('segm_image/segm_image/zadanie 1/E04_01_GFP.png', 0)
+    plt.subplot(221)
+    plt.imshow(gfp, cmap='gray')
+
+    markers = np.zeros_like(gfp)
+    markers[gfp > 60000] = 1
+    markers[gfp < 20000] = 2
+
+    plt.subplot(222)
+    plt.imshow(markers, cmap='gray')
+
+    watered = watershed(gfp, markers, watershed_line=True)
+    plt.subplot(223)
+    plt.imshow(watered, cmap='gray')
+
+    plt.show()
+
+
 if __name__ == '__main__':
     # otsu()
-    # water()
-    lungs()
+    water()
+    # lungs()
+    # water2()
