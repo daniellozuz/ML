@@ -2,11 +2,11 @@ import os
 import matplotlib.pyplot as plt
 from skimage.filters import threshold_otsu, sobel
 from skimage.color import rgb2gray
-from skimage.segmentation import watershed
+from skimage.segmentation import watershed, slic
 import numpy as np
 
 
-def ex_1():
+def otsu():
     folder = 'segm_image/segm_image/zadanie 1'
     images = [os.path.join(folder, image) for image in os.listdir(folder)]
 
@@ -23,7 +23,7 @@ def ex_1():
     plt.show()
 
 
-def ex_2():
+def water():
     folder = 'segm_image/segm_image/zadanie 2'
     image_names = [
         'ISIC_0000000',
@@ -59,6 +59,17 @@ def ex_2():
     plt.show()
 
 
+def lungs():
+    lungs_color = plt.imread('segm_image/segm_image/zadanie 3/Emphysema_H_and_E.jpg', 0)
+    plt.subplot(121)
+    plt.imshow(lungs_color)
+
+    plt.subplot(122)
+    plt.imshow(slic(lungs_color, n_segments=4, compactness=0.1, enforce_connectivity=False))
+
+    plt.show()
+
 if __name__ == '__main__':
-    # ex_1()
-    ex_2()
+    # otsu()
+    # water()
+    lungs()
